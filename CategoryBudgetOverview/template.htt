@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http - equiv = "Content-Type" content = "text/html">
+    <title>Category and Budget Overview</title>
+    <script src = "ChartNew.js"></script>
+    <script src = "sorttable.js"></script>
+    <link href = "master.css" rel = "stylesheet">
+	<style>
+		.bad {
+			color: red;
+		}
+		.good {
+			color: green;
+		}
+		table {
+			border-collapse: collapse;
+		}
+		.vl {
+			border-left: 1px solid grey;
+			border-right: 1px solid grey;
+		}
+		td:first-child, th:first-child {
+			border-left: none;
+		}
+	</style>
+</head>
+<body>
+    <div class="page-header">
+        <h2 class="text-center">Budget Monitoring for the current financial year</h2>
+        <p class="text-center">Compare Expenses, Income and Budget at <TMPL_VAR TODAY></p>
+    </div>
+
+<!-- Currently does nothing. Should allow you to select different years for the report -->
+<select id="selectYear" onchange="loadingBody()">
+</select>
+
+<div>
+
+<table class = "table">
+<thead id=tablehead>
+</thead>
+<tbody id=tablebody>
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<div id=debug>
+
+</div>
+
+</body>
+
+<script>
+	var debug = "";
+	var months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+	var sday = <TMPL_VAR "financial_year_start_day">;
+	var smonth = <TMPL_VAR "financial_year_start_month">;
+	var syear = 2018;
+
+	var year_prog;
+
+	var tmp = [];
+
+	var years = [];
+	var categories = {};
+
+	function cur(number, eraseZero){
+		eraseZero = typeof eraseZero !== 'undefined' ? eraseZero : true;
+		if(number == undefined|| isNaN(number) || (eraseZero && number == 0)){
+			return "";
+		}
+		return number.toFixed(2) + " €";
+	}
+
+	function per(number, eraseZero) {
+		eraseZero = typeof eraseZero !== 'undefined' ? eraseZero : true;
+		if(number == undefined|| isNaN(number) || (eraseZero && number == 0)){
+			return "";
+		}
+		number *= 100;
+		return number.toFixed(2) + " %";
+	}
+
+	function elementOf(arr, element){
+		for(i = 0; i < arr.length; i ++){
+			var cond = arr[i] == element;
+			<!--debug += field + " " + element + " " +cond + "<br>"; -->
+			if(cond) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function monthBucket(year, month, day){
+<!--		debug += year + "-" + month + "-" + day; -->
+		if(day < sday){ month = month - 1;}
+		if(month < smonth){year = year - 1;}
+		month -= smonth;
+		if(month < 0){ month += 12;}
+<!--		debug += ": " + year + " " + month + "<br>"; -->
+		return[year,month];
+	}
+
+	function tableHeader(){
+		var html = "";
+		html += "<tr>";
+		html += "<th>Kategorie</th>";
+		for(i = 0; i < 12; i++){
+			var index = i + smonth -1;
+			if(index >= 12){
+				index -= 12;
+			}
+			html += "<th>" + months[index] + "</th>";
+		}
+
+		html += "<th>Gesamt</th>";
+		html += "<th>Budget</th>";
+		html += "<th>Differenze</th>";
+		html += "<th>Prozent</th>";
+		html += "</tr>";
+		document.getElementById('tablehead').innerHTML = html;
+	}
+
+	function tableRow(kategorie, budget, sum){
+		var html = "";
+		var gesamt = 0;
+		html += "<tr>";
+		html += "<td class='vl'>"+ kategorie +"</td>";
+		for(var i = 0; i < 12; i++) {
+			gesamt += sum[i]
+			if(sum[i] > 0) {
+				html += "<td class='text-right'>" + cur(sum[i]) + "</td>";
+			} else {
+				html += "<td class='text-right bad'>" + cur(sum[i]) + "</td>";
+			}
+		}
+
+		if(gesamt > 0) {
+			html += "<td class='text-right vl'>" + cur(gesamt) + "</td>";
+		} else {
+			html += "<td class='text-right vl bad'>" + cur(gesamt) + "</td>";
+		}
+		html += "<td class='text-right vl'>" + cur(budget) + "</td>";
+		var diff = gesamt - budget;
+		if(diff < 0){
+			html += "<td class='text-right bad vl'>" + cur(diff) + "</td>";
+		} else {
+			html += "<td class='text-right vl'>" + cur(diff) + "</td>";
+		}
+		var perc = 0;
+		if(budget != 0){
+			perc = gesamt/budget;
+		}
+
+		if(perc > year_prog + 0.05){
+			html += "<td class='text-right bad vl'>" + per(perc) + "</td>";
+		} else if (perc < year_prog - 0.05) {
+			html += "<td class='text-right good vl'>" + per(perc) + "</td>";
+		} else {
+			html += "<td class='text-right vl'>" + per(perc) + "</td>";
+		}
+
+		html += "</tr>";
+		document.getElementById('tablebody').innerHTML += html;
+	}
+
+	function tableBody(){
+		_budget = [0,0, [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0]];
+		for(key in categories){
+			for(skey in categories[key]){
+				if(skey == "Empty") {
+					_cat = key
+				} else {
+					_cat = key + " - " + skey;
+				}
+
+				budget = categories[key][skey]["budget"];
+				if(budget > 0){
+					_budget[0] += budget;
+				} else {
+					_budget[1] += budget;
+				}
+
+				sum = categories[key][skey].months;
+				for(i = 0; i < 12; i ++){
+<!--					debug +=  sum[i] + ">0: " + (_sum[i]>0 ) + " mit  Type: " + typeof(sum[i]) + "<br>"; -->
+					if(sum[i] >= 0.){
+						_budget[2][i] += sum[i];
+					} else {
+						_budget[3][i] += sum[i];
+					}
+					_budget[4][i] += sum[i];
+				}
+
+				tableRow(_cat, budget, sum)
+			}
+		}
+		tableRow("", "", []);
+		tableRow("Einnahmen", _budget[0], _budget[2]);
+		tableRow("Ausgaben", _budget[1], _budget[3]);
+		tableRow("Gesamt", _budget[0] + _budget[1], _budget[4]);
+	}
+
+	<TMPL_LOOP NAME=CONTENTS>
+		var _cat = "<TMPL_VAR "CATEGNAME">";
+		var _subcat = "<TMPL_VAR "SUBCATEGNAME">";
+		var _sum = <TMPL_VAR "SUM">;
+		var _budget = <TMPL_VAR "BUDGET">;
+		var _budgetyear = "<TMPL_VAR "BUDGETYEARNAME">";
+		var _year = "<TMPL_VAR "YEAR">";
+		var _month = "<TMPL_VAR "MONTH">";
+		var _day = "<TMPL_VAR "DAY">";
+
+		<!-- Populate years for dropdown -->
+		if (_budgetyear != "" &&  !elementOf(years,_budgetyear)){
+			years.push(_budgetyear);
+		}
+		if (_year != "" &&  !elementOf(years, _year)){
+			years.push(_year);
+			var tmp_year = monthBucket(_year,_month,_day)[0];
+			if(!elementOf(years,tmp_year)){
+				years.push(tmp_year);
+			}
+		}
+
+		<!-- Populate categories -->
+		if (!(_cat in categories)) {
+			categories[_cat] = {};
+		}
+		if(_subcat == ""){
+			_subcat = "Empty";
+		}
+		if(!(_subcat in categories[_cat])){
+			categories[_cat][_subcat] = {"budget": 0,"months":[0,0,0,0,0,0,0,0,0,0,0,0] ,};
+		}
+
+		tmp.push({"cat": _cat, "subcat": _subcat,"sum":_sum,"budget":_budget,"budgetyear":_budgetyear,"year":_year,"month":_month,"day":_day});
+
+	</TMPL_LOOP>
+
+	function initMenu(){
+		for(i=0; i < years.length; i++){
+			<!--		debug += "<br>" + years[i]; -->
+			document.getElementById('selectYear').innerHTML +=  "<option value=" + years[i] + ">" + years[i] + "</option>";
+		}
+	}
+
+	function populate(year){
+
+		for(i=0; i<tmp.length; i++){
+			var obj = tmp[i];
+			if(obj.budgetyear == year && categories[obj.cat][obj.subcat].budget == 0){
+				categories[obj.cat][obj.subcat].budget += obj.budget;
+				debug += obj.budget + "<br>";
+			}
+
+			var bucket = monthBucket(obj.year, obj.month, obj.day);
+			if(bucket[0] == year) {
+				categories[obj.cat][obj.subcat].months[bucket[1]] += obj.sum;
+			}
+		}
+	}
+
+	function yearProg(){
+		var tmpm, tmpd;
+		if(smonth < 10){
+			tmpm = "0" +  smonth;
+		} else {
+			tmpm = smonth;
+		}
+		if(sday < 10){
+			tmpd = "0" + sday;
+		} else {
+			tmpd = sday;
+		}
+		var tmp = "-" + tmpm + "-" + tmpd;
+		var t1 = new Date("<TMPL_VAR TODAY>");
+		var t2 = new Date(syear + tmp);
+		var t3 = new Date((syear+1) + tmp);
+		var d1 = Math.floor((t1 - t2) / (1000*60*60*24));
+		var d2 = Math.floor((t3 - t2) / (1000*60*60*24));
+		return Math.min(Math.max(d1/d2, 0), 1);
+	}
+
+	year_prog = yearProg();
+	years.sort();
+	initMenu();
+	populate(syear);
+	tableHeader();
+	tableBody();
+
+
+
+	<!--Aus gründen muss ich die funktionen zuerst einmal ausführen-->
+	elementOf(["String", 2019, "2018"], "2016");
+	monthBucket(2018,10,1);
+	<!--document.getElementById('debug').innerHTML += debug; -->
+</script>
+</html>

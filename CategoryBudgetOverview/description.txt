@@ -1,0 +1,5 @@
+Category Budget Overview:
+
+Get a nice colored table which shows your expenses per month and category and the cummulated income/expenses per month,
+as well as your planned budget per category per year with the difference to the actual amount and a percentage indicator.
+This report tries to combine the (IMO) best parts from the 'Budget Performance' and 'Budget Category Summary' reports.
