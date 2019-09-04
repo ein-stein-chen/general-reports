@@ -258,10 +258,12 @@
 	</TMPL_LOOP>
 
 	function initMenu(){
+		html = "";
 		for(i=0; i < years.length; i++){
 			<!--		debug += "<br>" + years[i]; -->
-			document.getElementById('selectYear').innerHTML +=  "<option value=" + years[i] + ">" + years[i] + "</option>";
+			html +=  "<option value=" + years[i] + ">" + years[i] + "</option>";
 		}
+		document.getElementById('selectYear').innerHTML = html;
 	}
 
 	function populate(year){
