@@ -276,7 +276,7 @@
 			}
 
 			var bucket = monthBucket(obj.year, obj.month, obj.day);
-			if(bucket[0] == year) {
+			if((obj.budgetyear == year || obj.budgetyear == "" )&& bucket[0] == year) {
 				categories[obj.cat][obj.subcat].months[bucket[1]] += obj.sum;
 			}
 		}
