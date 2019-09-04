@@ -140,30 +140,43 @@
 				html += "<td class='text-right bad'>" + cur(sum[i]) + "</td>";
 			}
 		}
-
-		if(gesamt > 0) {
+		income = gesamt > 0
+		if(income) {
 			html += "<td class='text-right vl'>" + cur(gesamt) + "</td>";
 		} else {
 			html += "<td class='text-right vl bad'>" + cur(gesamt) + "</td>";
 		}
+
 		html += "<td class='text-right vl'>" + cur(budget) + "</td>";
+
 		var diff = gesamt - budget;
 		if(diff < 0){
 			html += "<td class='text-right bad vl'>" + cur(diff) + "</td>";
 		} else {
 			html += "<td class='text-right vl'>" + cur(diff) + "</td>";
 		}
+
 		var perc = 0;
 		if(budget != 0){
 			perc = gesamt/budget;
 		}
 
-		if(perc > year_prog + 0.05){
-			html += "<td class='text-right bad vl'>" + per(perc) + "</td>";
-		} else if (perc < year_prog - 0.05) {
-			html += "<td class='text-right good vl'>" + per(perc) + "</td>";
+		if(income) {
+			if(perc < year_prog + 0.05){
+				html += "<td class='text-right bad vl'>" + per(perc) + "</td>";
+			} else if (perc > year_prog - 0.05) {
+				html += "<td class='text-right good vl'>" + per(perc) + "</td>";
+			} else {
+				html += "<td class='text-right vl'>" + per(perc) + "</td>";
+			}
 		} else {
-			html += "<td class='text-right vl'>" + per(perc) + "</td>";
+			if(perc > year_prog + 0.05){
+				html += "<td class='text-right bad vl'>" + per(perc) + "</td>";
+			} else if (perc < year_prog - 0.05) {
+				html += "<td class='text-right good vl'>" + per(perc) + "</td>";
+			} else {
+				html += "<td class='text-right vl'>" + per(perc) + "</td>";
+			}
 		}
 
 		html += "</tr>";
