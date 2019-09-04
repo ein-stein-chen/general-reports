@@ -11,7 +11,7 @@ WITH t AS (
              FROM (
                       SELECT CHECKINGACCOUNT_V1.TRANSID,
                              TRANSCODE,
-                             TRANSAMOUNT,
+                             SPLITTRANSAMOUNT AS TRANSAMOUNT,
                              TRANSDATE,
                              SPLITTRANSACTIONS_V1.CATEGID,
                              SPLITTRANSACTIONS_V1.SUBCATEGID
