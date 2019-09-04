@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http - equiv = "Content-Type" content = "text/html">
-    <title>Category and Budget Overview</title>
+    <title>Title</title>
     <script src = "ChartNew.js"></script>
     <script src = "sorttable.js"></script>
     <link href = "master.css" rel = "stylesheet">
