@@ -45,16 +45,9 @@
 </table>
 </div>
 
-<hr>
-
-<div id=debug>
-
-</div>
-
 </body>
 
 <script>
-	var debug = "";
 	var months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 
 	var sday = <TMPL_VAR "financial_year_start_day">;
@@ -87,7 +80,6 @@
 	function elementOf(arr, element){
 		for(i = 0; i < arr.length; i ++){
 			var cond = arr[i] == element;
-			<!--debug += field + " " + element + " " +cond + "<br>"; -->
 			if(cond) {
 				return true;
 			}
@@ -96,12 +88,10 @@
 	}
 
 	function monthBucket(year, month, day){
-<!--		debug += year + "-" + month + "-" + day; -->
 		if(day < sday){ month = month - 1;}
 		if(month < smonth){year = year - 1;}
 		month -= smonth;
 		if(month < 0){ month += 12;}
-<!--		debug += ": " + year + " " + month + "<br>"; -->
 		return[year,month];
 	}
 
@@ -201,7 +191,6 @@
 
 				sum = categories[key][skey].months;
 				for(i = 0; i < 12; i ++){
-<!--					debug +=  sum[i] + ">0: " + (_sum[i]>0 ) + " mit  Type: " + typeof(sum[i]) + "<br>"; -->
 					if(sum[i] >= 0.){
 						_budget[2][i] += sum[i];
 					} else {
@@ -260,7 +249,6 @@
 	function initMenu(){
 		html = "";
 		for(i=0; i < years.length; i++){
-			<!--		debug += "<br>" + years[i]; -->
 			html +=  "<option value=" + years[i] + ">" + years[i] + "</option>";
 		}
 		document.getElementById('selectYear').innerHTML = html;
@@ -317,12 +305,9 @@
 
 	function renderTable(){
 		year = document.getElementById('selectYear').value;
-		debug += year;
 		resetCategories();
 		populate(year);
 		tableBody();
-		debug += monthBucket(2018,06,07);
-		document.getElementById('debug').innerHTML += debug;
 	}
 
 	year_prog = yearProg();
@@ -335,6 +320,5 @@
 	<!--Aus gründen muss ich die funktionen zuerst einmal ausführen-->
 	elementOf(["String", 2019, "2018"], "2016");
 	monthBucket(2018,10,1);
-	<!--document.getElementById('debug').innerHTML += debug; -->
 </script>
 </html>
