@@ -249,7 +249,7 @@
 	function initMenu(){
 		html = "";
 		for(i=0; i < years.length; i++){
-			html +=  "<option value=" + years[i] + ">" + years[i] + "</option>";
+			html =  "<option value=" + years[i] + ">" + years[i] + "</option>" + html;
 		}
 		document.getElementById('selectYear').innerHTML = html;
 	}
@@ -283,7 +283,7 @@
 
 	function yearProg(){
 		var tmpm, tmpd;
-		syear = document.getElementById('selectYear').value;
+		year = document.getElementById('selectYear').value;
 		if(smonth < 10){
 			tmpm = "0" +  smonth;
 		} else {
@@ -296,8 +296,8 @@
 		}
 		var tmp = "-" + tmpm + "-" + tmpd;
 		var t1 = new Date("<TMPL_VAR TODAY>");
-		var t2 = new Date(syear + tmp);
-		var t3 = new Date((syear+1) + tmp);
+		var t2 = new Date(year + tmp);
+		var t3 = new Date((year+1) + tmp);
 		var d1 = Math.floor((t1 - t2) / (1000*60*60*24));
 		var d2 = Math.floor((t3 - t2) / (1000*60*60*24));
 		return Math.min(Math.max(d1/d2, 0), 1);
@@ -320,5 +320,7 @@
 	<!--Aus gründen muss ich die funktionen zuerst einmal ausführen-->
 	elementOf(["String", 2019, "2018"], "2016");
 	monthBucket(2018,10,1);
+
+  renderTable();
 </script>
 </html>
