@@ -63,14 +63,11 @@ WITH im AS (SELECT INFOVALUE FROM INFOTABLE_V1 WHERE INFOID == 12),
 SELECT 0            AS TYPE,
        null         AS CATEGNAME,
        null         AS SUBCATEGNAME,
-       null         AS BUDGETYEARNAME,
        0              AS BUDGET,
        0              AS SUM,
-       im.INFOVALUE AS 'FINANCIAL_YEAR_START_MONTH',
-       id.INFOVALUE AS 'FINANCIAL_YEAR_START_DAY',
        NULL         AS YEAR,
-       NULL         AS MONTH,
-       NULL         AS DAY
+       im.INFOVALUE AS MONTH,
+       id.INFOVALUE AS DAY
 FROM im,
      id
 
@@ -79,12 +76,9 @@ UNION
 SELECT 1    AS TYPE,
        CATEGNAME,
        SUBCATEGNAME,
-       BUDGETYEARNAME,
        IFNULL(BUDGET, 0) AS BUDGET,
        0      AS SUM,
-       0      AS 'FINANCIAL_YEAR_START_MONTH',
-       0      AS 'FINANCIAL_YEAR_START_DAY',
-       NULL AS YEAR,
+       BUDGETYEARNAME AS YEAR,
        NULL AS MONTH,
        NULL AS DAY
 FROM c
@@ -96,11 +90,8 @@ UNION
 SELECT 2    AS TYPE,
        CATEGNAME,
        SUBCATEGNAME,
-       null AS BUDGETYEARNAME,
        0      AS BUDGET,
        SUM,
-       0      AS 'FINANCIAL_YEAR_START_MONTH',
-       0      AS 'FINANCIAL_YEAR_START_DAY',
        YEAR,
        MONTH,
        DAY
