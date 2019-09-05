@@ -210,6 +210,7 @@
 	}
 
 	<TMPL_LOOP NAME=CONTENTS>
+		var _type = <TMPL_VAR "TYPE">;
 		var _cat = "<TMPL_VAR "CATEGNAME">";
 		var _subcat = "<TMPL_VAR "SUBCATEGNAME">";
 		var _sum = <TMPL_VAR "SUM">;
@@ -242,7 +243,7 @@
 			categories[_cat][_subcat] = {"budget": 0,"months":[0,0,0,0,0,0,0,0,0,0,0,0] ,};
 		}
 
-		tmp.push({"cat": _cat, "subcat": _subcat,"sum":_sum,"budget":_budget,"budgetyear":_budgetyear,"year":_year,"month":_month,"day":_day});
+		tmp.push({"type": _type, "cat": _cat, "subcat": _subcat,"sum":_sum,"budget":_budget,"budgetyear":_budgetyear,"year":_year,"month":_month,"day":_day});
 
 	</TMPL_LOOP>
 
