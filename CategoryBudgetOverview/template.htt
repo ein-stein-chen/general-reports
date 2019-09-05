@@ -48,7 +48,7 @@
 </body>
 
 <script>
-	var months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+	var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 	var sday = <TMPL_VAR "financial_year_start_day">;
 	var smonth = <TMPL_VAR "financial_year_start_month">;
