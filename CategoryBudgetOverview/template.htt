@@ -32,8 +32,7 @@
         <p class="text-center">Compare Expenses, Income and Budget at <TMPL_VAR TODAY></p>
     </div>
 
-<!-- Currently does nothing. Should allow you to select different years for the report -->
-<select id="selectYear" onchange="loadingBody()">
+<select id="selectYear" onchange="renderTable()">
 </select>
 
 <div>
@@ -60,7 +59,6 @@
 
 	var sday = <TMPL_VAR "financial_year_start_day">;
 	var smonth = <TMPL_VAR "financial_year_start_month">;
-	var syear = 2018;
 
 	var year_prog;
 
@@ -180,11 +178,12 @@
 		}
 
 		html += "</tr>";
-		document.getElementById('tablebody').innerHTML += html;
+		return html;
 	}
 
 	function tableBody(){
 		_budget = [0,0, [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0]];
+		html = "";
 		for(key in categories){
 			for(skey in categories[key]){
 				if(skey == "Empty") {
@@ -211,13 +210,14 @@
 					_budget[4][i] += sum[i];
 				}
 
-				tableRow(_cat, budget, sum)
+				html += tableRow(_cat, budget, sum)
 			}
 		}
-		tableRow("", "", []);
-		tableRow("Einnahmen", _budget[0], _budget[2]);
-		tableRow("Ausgaben", _budget[1], _budget[3]);
-		tableRow("Gesamt", _budget[0] + _budget[1], _budget[4]);
+		html += tableRow("", "", []);
+		html += tableRow("Einnahmen", _budget[0], _budget[2]);
+		html += tableRow("Ausgaben", _budget[1], _budget[3]);
+		html += tableRow("Gesamt", _budget[0] + _budget[1], _budget[4]);
+		document.getElementById('tablebody').innerHTML = html;
 	}
 
 	<TMPL_LOOP NAME=CONTENTS>
@@ -266,17 +266,28 @@
 		document.getElementById('selectYear').innerHTML = html;
 	}
 
-	function populate(year){
+	function resetCategories(){
+		for(var _cat in categories) {
+			for(var _subcat in categories[_cat]){
+				categories[_cat][_subcat] =  {"budget": 0,"months":[0,0,0,0,0,0,0,0,0,0,0,0] ,};
+			}
+		}
+	}
 
+
+	function populate(year){
+		var tmpyear = "";
 		for(i=0; i<tmp.length; i++){
 			var obj = tmp[i];
 			if(obj.budgetyear == year && categories[obj.cat][obj.subcat].budget == 0){
 				categories[obj.cat][obj.subcat].budget += obj.budget;
-				debug += obj.budget + "<br>";
 			}
 
 			var bucket = monthBucket(obj.year, obj.month, obj.day);
-			if((obj.budgetyear == year || obj.budgetyear == "" )&& bucket[0] == year) {
+			if(tmpyear == "" && obj.budgetyear != ""){
+				tmpyear = obj.budgetyear;
+			}
+			if((obj.budgetyear == tmpyear || obj.budgetyear == "" )&& bucket[0] == year) {
 				categories[obj.cat][obj.subcat].months[bucket[1]] += obj.sum;
 			}
 		}
@@ -284,6 +295,7 @@
 
 	function yearProg(){
 		var tmpm, tmpd;
+		syear = document.getElementById('selectYear').value;
 		if(smonth < 10){
 			tmpm = "0" +  smonth;
 		} else {
@@ -303,12 +315,20 @@
 		return Math.min(Math.max(d1/d2, 0), 1);
 	}
 
+	function renderTable(){
+		year = document.getElementById('selectYear').value;
+		debug += year;
+		resetCategories();
+		populate(year);
+		tableBody();
+		debug += monthBucket(2018,06,07);
+		document.getElementById('debug').innerHTML += debug;
+	}
+
 	year_prog = yearProg();
 	years.sort();
 	initMenu();
-	populate(syear);
 	tableHeader();
-	tableBody();
 
 
 
