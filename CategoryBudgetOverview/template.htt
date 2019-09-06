@@ -34,6 +34,10 @@
 
 <select id="selectYear" onchange="renderTable()">
 </select>
+<select id="showEmptyRows" onchange="renderTable()">
+	<option value= 0 > Hide Empty Rows</option>
+	<option value= 1 > Show Empty Rows</option>
+</select>
 
 <div>
 
@@ -118,7 +122,6 @@
 	function tableRow(kategorie, budget, sum){
 		var html = "";
 		var gesamt = 0;
-		html += "<tr>";
 		html += "<td class='vl'>"+ kategorie +"</td>";
 		for(var i = 0; i < 12; i++) {
 			gesamt += sum[i]
@@ -167,7 +170,6 @@
 			}
 		}
 
-		html += "</tr>";
 		return html;
 	}
 
@@ -198,14 +200,22 @@
 					}
 					_budget[4][i] += sum[i];
 				}
-
-				html += tableRow(_cat, budget, sum)
+				var isAllZero = true;
+				for(i = 0; i < sum.length; ++i) {
+					if(sum[i] !== 0) {
+						isAllZero = false;
+						break;
+					}
+				}
+				if(document.getElementById('showEmptyRows').value == 1 || budget !== 0 || !isAllZero){
+					html += "<tr>" + tableRow(_cat, budget, sum) + "</tr>";
+					_catsum[2] += 1;
+				}
 			}
 		}
-		html += tableRow("", "", []);
-		html += tableRow("Einnahmen", _budget[0], _budget[2]);
-		html += tableRow("Ausgaben", _budget[1], _budget[3]);
-		html += tableRow("Gesamt", _budget[0] + _budget[1], _budget[4]);
+		html += "<tr>" + tableRow("Einnahmen", _budget[0], _budget[2]) + "</tr>";
+		html += "<tr>" + tableRow("Ausgaben", _budget[1], _budget[3]) + "</tr>";
+		html += "<tr>" + tableRow("Gesamt", _budget[0] + _budget[1], _budget[4]) + "</tr>";
 		document.getElementById('tablebody').innerHTML = html;
 	}
 
