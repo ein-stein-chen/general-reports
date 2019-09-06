@@ -14,6 +14,9 @@
 		.good {
 			color: green;
 		}
+		.ok {
+			color: orange;
+		}
 		table {
 			border-collapse: collapse;
 		}
@@ -138,7 +141,11 @@
 			html += "<td class='text-right vl bad'>" + cur(gesamt) + "</td>";
 		}
 
-		html += "<td class='text-right vl'>" + cur(budget) + "</td>";
+		if(budget < 0) {
+			html += "<td class='text-right vl ok'>" + cur(budget) + "</td>";
+		} else {
+			html += "<td class='text-right vl'>" + cur(budget) + "</td>";
+		}
 
 		var diff = gesamt - budget;
 		if(diff < 0){
