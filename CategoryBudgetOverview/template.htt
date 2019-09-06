@@ -17,6 +17,9 @@
 		.ok {
 			color: orange;
 		}
+		.catsum {
+			background-color: gainsboro;
+		}
 		table {
 			border-collapse: collapse;
 		}
@@ -184,6 +187,7 @@
 		_budget = [0,0, [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0,0,0,0,0]];
 		html = "";
 		for(key in categories){
+			_catsum = [0,[0,0,0,0,0,0,0,0,0,0,0,0],0];
 			for(skey in categories[key]){
 				if(skey == "Empty") {
 					_cat = key
@@ -197,6 +201,7 @@
 				} else {
 					_budget[1] += budget;
 				}
+				_catsum[0] += budget;
 
 				sum = categories[key][skey].months;
 				for(i = 0; i < 12; i ++){
@@ -206,6 +211,7 @@
 						_budget[3][i] += sum[i];
 					}
 					_budget[4][i] += sum[i];
+					_catsum[1][i] += sum[i];
 				}
 				var isAllZero = true;
 				for(i = 0; i < sum.length; ++i) {
@@ -218,6 +224,12 @@
 					html += "<tr>" + tableRow(_cat, budget, sum) + "</tr>";
 					_catsum[2] += 1;
 				}
+			}
+			if( key != "" && _catsum[2] > 1) {
+				html += "<tr class='catsum'>" + tableRow(key + " -  Gesamt:", _catsum[0], _catsum[1]) + "</tr>";
+			}
+			if( _catsum[2] > 0) {
+				html += "<tr>" + tableRow("", "", []) + "</tr>";
 			}
 		}
 		html += "<tr>" + tableRow("Einnahmen", _budget[0], _budget[2]) + "</tr>";
