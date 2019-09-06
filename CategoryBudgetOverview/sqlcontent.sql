@@ -15,13 +15,13 @@ WITH im AS (SELECT INFOVALUE FROM INFOTABLE_V1 WHERE INFOID == 12),
                   BUDGETYEARNAME,
                   total(
                           case
-                              when Period = 'Weekly' then Amount * 30.41667 / 7 * 12
-                              when Period = 'Bi-Weekly' then Amount * 30.41667 / 7 / 2 * 12
+                              when Period = 'Weekly' then Amount * 30.41667 * 12 / 7
+                              when Period = 'Bi-Weekly' then Amount * 30.41667 * 6 / 7
                               when Period = 'Monthly' then Amount * 12
-                              when Period = 'Bi-Monthly' then Amount / 2 * 12
-                              when Period = 'Quarterly' then Amount / 3 * 12
-                              when Period = 'Half-Yearly' then Amount / 6 * 12
-                              when Period = 'Yearly' then Amount / 12 * 12
+                              when Period = 'Bi-Monthly' then Amount * 6
+                              when Period = 'Quarterly' then Amount * 4
+                              when Period = 'Half-Yearly' then Amount * 2
+                              when Period = 'Yearly' then Amount
                               when Period = 'Daily' then Amount * 30.41667
                               end) AS BUDGET
            FROM BUDGETTABLE_V1
